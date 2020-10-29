@@ -1,0 +1,69 @@
+# zookeeper ensemble used to register containers; we do not run benchmark against this ensemble
+registry:
+  nodes:
+    3: 10.32.41.6
+  user: 013736658
+  passwordLess: True
+  passwd: sushant
+  cwd-prefix: /srv/home/013736658/zkperf-reg
+  tickTime: 2000
+  initLimit: 10
+  syncLimit: 5
+  dataDir: zoodata
+  clientPort: 2181
+  quorumPort: 2888
+  leaderElectionPort: 3888
+  admin:
+    serverPort: 8080
+    serverAddress: localhost
+    4lw.commands.whitelist: "*"
+  java-sys-properties:
+
+
+# servers nodes to create ensemble for benchmarking
+server-containers:
+  nodes:
+    1: 10.32.41.4
+    2: 10.32.41.5
+    3: 10.32.41.6
+  user: 013736658
+  passwd:
+  passwordLess: True
+  home: /srv/home/013736658
+  icTestDir: /srv3/test
+  icDataDir: /srv2/snap
+#  icDataLogDir: /srv3/log
+  icDataLogDir: /nvme1/sut-txn
+  cwd-prefix: /srv/home/013736658/zkperf-sic
+
+
+
+# nodes from which to run clients for benchmarking
+client-containers:
+  nodes:
+    1: 10.32.41.4
+    2: 10.32.41.5
+    3: 10.32.41.6
+  user: 013736658
+  passwd:
+  passwordLess: true
+  cwd-prefix: /srv/home/013736658/zkperf-cic
+
+
+# generate load node
+load-manager:
+  host: cs-reed-06.cs.sjsu.edu
+  cwd: /srv/home/013736658/zkperf-ctrl
+  user: 013736658
+  passwd:
+  passwordLess: true
+
+artifacts:
+  log4j: '../artifacts/log4j.properties'
+  fat-jar: '../artifacts/zookeeper-3.7.0-SNAPSHOT-fatjar.jar'
+
+paths:
+  bm-out-file: bench_res.dat
+  archive: archive
+  plots: plots
+
