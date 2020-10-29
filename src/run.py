@@ -109,9 +109,9 @@ def test_digest():
 
 
 if __name__ == '__main__':
-    # setup()
+    setup()
     # Three types of tests
     # test_noadhash_digest()
-    # test_digest()
-    # stop()
+    test_digest()
+    stop()
     destroy()
