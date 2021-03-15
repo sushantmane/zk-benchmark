@@ -1,7 +1,7 @@
 # zookeeper ensemble used to register containers; we do not run benchmark against this ensemble
 registry:
   nodes:
-    3: 10.32.41.6
+    1: 10.32.41.6
   user: 013736658
   passwordLess: True
   passwd: sushant
@@ -23,9 +23,9 @@ registry:
 # servers nodes to create ensemble for benchmarking
 server-containers:
   nodes:
-    1: 10.32.41.4
-    2: 10.32.41.5
-    3: 10.32.41.6
+    1: 10.32.41.3
+    2: 10.32.41.4
+    3: 10.32.41.5
   user: 013736658
   passwd:
   passwordLess: True
@@ -41,9 +41,8 @@ server-containers:
 # nodes from which to run clients for benchmarking
 client-containers:
   nodes:
-    1: 10.32.41.4
-    2: 10.32.41.5
-    3: 10.32.41.6
+    1: 10.32.41.1
+    2: 10.32.41.7
   user: 013736658
   passwd:
   passwordLess: true

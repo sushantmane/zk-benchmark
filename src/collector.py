@@ -1,6 +1,7 @@
 import logging
 import yaml
 import datetime
+import random
 
 from ssh_client import SshClient, Node
 
@@ -38,7 +39,9 @@ class LoadManager:
     def start(self, sys_props, n_srv, n_cli, req_size):
         cmd = ("java "
                + sys_props
-               + " -jar " + self.jar_remote + " generateLoad "
+               + " -Dzookeeper.log.dir=" + self.cwd
+               + " -Dlog4j.configuration=file:" + self.log4j_remote
+               + " -jar " + self.jar_remote + " generateLoad --leaderServes "
                + self.registry + ":" + str(self.registry_port)
                + " /generateLoad "
                + str(n_srv) + " " + str(n_cli) + " " + str(req_size) + " < "
@@ -51,8 +54,8 @@ class LoadManager:
         # samples = random.sample(range(0, 101, 10), 11)
         gen_out = self.cwd + "/bench." + ext
         with open(self.load_data_file, 'w') as f:
-            f.write("sleep 30\n")
-            time += 30
+            f.write("sleep 60\n")
+            time += 60
             f.write("save " + gen_out + "\n")
             for per in samples:
                 f.write("percentage " + str(per) + "\n")
@@ -68,7 +71,7 @@ class LoadManager:
 
     def stop(self):
         cmd = ("ps aux | grep -v grep | grep " + self.jar_remote
-               + " | grep sic- | awk '{print $2}' | xargs kill -9")
+               + " | awk '{print $2}' | xargs kill -9")
         self.ssh.execute(self.host, cmd)
 
     def destroy(self):
@@ -88,7 +91,7 @@ class LoadManager:
 
     def get_bench_data(self, ext):
         da = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-        self.ssh.get(self.host, self.cwd + '/bench.' + ext, "../bench-data/" + da + "." + ext)
+        self.ssh.get(self.host, self.cwd + '/bench.' + ext, "/srv/home/013736658/zkupshot/bench-data/" + da + "." + ext)
 
     def close_all_cnxs(self):
         self.ssh.close(self.host)

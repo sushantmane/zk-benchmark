@@ -14,7 +14,7 @@ class ServerContainer:
         with open('config.yml', 'r') as f:
             self.conf = yaml.load(f, Loader=yaml.FullLoader)
             self.cfg = self.conf['server-containers']
-            self.registry = list(self.conf['registry']['nodes'].values())
+            self.registry = list(self.conf['registry']['nodes'].values())[0]
             self.registry_port = self.conf['registry']['clientPort']
         self.nodes = dict()
         for nid in self.cfg['nodes']:
@@ -45,8 +45,6 @@ class ServerContainer:
     # for forcing the use of specific ip, add ip address to use under nodes in config file
     # and then set use_ic_ip to True
     def start(self, sys_props=" -Dzookeeper.digest.enabled=false ", use_ic_ip=False):
-        i = 0
-        m = len(self.registry)
         for nid in self.nodes:
             ic_ip = ' '
             if use_ic_ip:
@@ -59,9 +57,8 @@ class ServerContainer:
                    + " -Dtest.data.dir=" + self.ic_test_dir
                    + " -DsnapDir=" + self.ic_data_dir + " -DlogDir=" + self.ic_log_dir
                    + " -jar " + self.jar_remote + " ic " + "sic-" + str(nid) + " "
-                   + self.registry[i % m] + ":" + str(self.registry_port)
+                   + self.registry + ":" + str(self.registry_port)
                    + " /generateLoad &")
-            i += 1
             self.ssh.execute(self.nodes.get(nid), cmd)
 
     def stop(self):
@@ -111,7 +108,7 @@ class ClientContainer:
         with open('config.yml', 'r') as f:
             self.conf = yaml.load(f, Loader=yaml.FullLoader)
             self.cfg = self.conf['client-containers']
-            self.registry = list(self.conf['registry']['nodes'].values())
+            self.registry = list(self.conf['registry']['nodes'].values())[0]
             self.registry_port = self.conf['registry']['clientPort']
         self.nodes = dict()
         for nid in self.cfg['nodes']:
@@ -136,16 +133,13 @@ class ClientContainer:
         self.put_log4j()
 
     def start(self, sys_props=''):
-        i = 0
-        m = len(self.registry)
         for nid in self.nodes:
             cmd = ("java " + sys_props
                    + " -Dzookeeper.log.dir=" + self.cwd
                    + " -Dlog4j.configuration=file:" + self.log4j_remote
                    + " -jar " + self.jar_remote + " ic " + " cic-" + str(nid) + " "
-                   + self.registry[i % m] + ":" + str(self.registry_port)
+                   + self.registry + ":" + str(self.registry_port)
                    + " /generateLoad &")
-            i += 1
             self.ssh.execute(self.nodes.get(nid), cmd)
 
     def stop(self):

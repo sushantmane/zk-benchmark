@@ -1,5 +1,7 @@
 import logging
 import time
+import sys
+import random
 
 from containers import ServerContainer, ClientContainer
 from registry import ZooRegistry
@@ -13,6 +15,11 @@ cic = ClientContainer()
 reg = ZooRegistry()
 lm = LoadManager()
 
+exec_time = 180
+reqsz_bytes = [1024, 4096]
+# reqsz_bytes = [1024, 2048, 65536, 4096]
+#samples = random.sample(range(0, 101, 10), 11)
+samples = range(0, 101, 10)
 
 def setup():
     reg.setup()
@@ -48,13 +55,28 @@ def destroy():
     reg.destroy()
     lm.destroy()
 
+def cleanall():
+    LOG.info("stopping collector...")
+    lm.stop()
+    LOG.info("stopping client ics...")
+    cic.stop()
+    LOG.info("stopping server ics...")
+    sic.stop()
+    LOG.info("stopping registry ics...")
+    reg.stop()
+    cic.destroy()
+    sic.destroy()
+    reg.destroy()
+    lm.destroy()
 
 def del_data():
     sic.del_sic_data()
     reg.del_zkreg_data()
 
 
-def run_test(name='', algo='', sys_prop='', reqsz=1024, servers=3, clients=9):
+no_test = True
+
+def run_test(name='', algo='', sys_prop='', reqsz=1024, servers=3, clients=900):
     LOG.info("BENCH: %s", name)
     LOG.info("__config__ - props:%s reqsz:%s server:%s clients:%s",
              sys_prop, reqsz, servers, clients)
@@ -62,8 +84,8 @@ def run_test(name='', algo='', sys_prop='', reqsz=1024, servers=3, clients=9):
     # start registry and instance containers
     start(sys_prop)
 
-    samples = range(0, 101, 40)
-    tm = lm.gen_load_file(24, name, samples)
+    #samples = range(0, 101, 10)
+    tm = lm.gen_load_file(exec_time, name, samples)
 
     LOG.info("start load manager...")
     lm.start(sys_prop, servers, clients, reqsz)
@@ -88,18 +110,18 @@ def run_test(name='', algo='', sys_prop='', reqsz=1024, servers=3, clients=9):
 
 def test_noadhash_digest():
     LOG.info("===> test: no adhash (no digest check) ")
-    reqsz_bytes = [1024]
     for sz in reqsz_bytes:
         name = "NA_" + str(sz) + "KiB"
         run_test(name=name, algo="NA", sys_prop=' -Dzookeeper.digest.enabled=false ', reqsz=sz)
 
 
 def test_digest():
-    hash_algos = ['CRC-32', 'SHA', 'SHA-256', 'SHA-512', 'MD5']
-    reqsz_bytes = [1024, 2048, 4096, 65536]
+    hash_algos = ['SHA-256', 'CRC-32', 'SHA', 'SHA-512', 'MD5', 'SHA3-256']
+    #hash_algos = ['CRC-32', 'MD5', 'SHA3-256']
+
     predictive_digest = [True, False]
-    for pd in predictive_digest:
-        for sz in reqsz_bytes:
+    for sz in reqsz_bytes:
+        for pd in predictive_digest:
             for ha in hash_algos:
                 name = ha + '_PD-' + str(pd) + '_' + str(sz) + 'KiB'
                 prop = (' -Dzookeeper.digest.enabled=true'
@@ -109,9 +131,12 @@ def test_digest():
 
 
 if __name__ == '__main__':
+    if (len(sys.argv) > 1 and sys.argv[1] == "-c"):
+        print("cleanup..")
+        cleanall()
+        sys.exit()
     setup()
-    # Three types of tests
-    # test_noadhash_digest()
+    test_noadhash_digest()
     test_digest()
     stop()
     destroy()
