@@ -16,13 +16,14 @@ reg = ZooRegistry()
 lm = LoadManager()
 
 exec_time = 180
-reqsz_bytes = [1024, 4096]
+reqsz_bytes = [1024]
 # reqsz_bytes = [1024, 2048, 65536, 4096]
 #samples = random.sample(range(0, 101, 10), 11)
 samples = range(0, 101, 10)
 
 def setup():
     reg.setup()
+    time.sleep(30)
     sic.setup()
     cic.setup()
     lm.setup()
@@ -88,7 +89,9 @@ def run_test(name='', algo='', sys_prop='', reqsz=1024, servers=3, clients=900):
     tm = lm.gen_load_file(exec_time, name, samples)
 
     LOG.info("start load manager...")
-    lm.start(sys_prop, servers, clients, reqsz)
+    #clients=0
+    lm.start("", servers, clients, reqsz)
+    #time.sleep(100000)
 
     LOG.info("waiting...")
     time.sleep(tm)
@@ -116,10 +119,12 @@ def test_noadhash_digest():
 
 
 def test_digest():
-    hash_algos = ['SHA-256', 'CRC-32', 'SHA', 'SHA-512', 'MD5', 'SHA3-256']
+    #hash_algos = ['MD5', 'SHA']
+    hash_algos = ['SHA-512', 'MD5', 'CRC-32', 'SHA-256', 'SHA']
+    #hash_algos = ['CRC-32', 'SHA-256', 'SHA', 'SHA-512', 'MD5']
     #hash_algos = ['CRC-32', 'MD5', 'SHA3-256']
 
-    predictive_digest = [True, False]
+    predictive_digest = [False, True]
     for sz in reqsz_bytes:
         for pd in predictive_digest:
             for ha in hash_algos:

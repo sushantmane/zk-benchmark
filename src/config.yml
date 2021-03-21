@@ -1,7 +1,7 @@
 # zookeeper ensemble used to register containers; we do not run benchmark against this ensemble
 registry:
   nodes:
-    1: 10.32.41.6
+    1: 10.32.41.1
   user: 013736658
   passwordLess: True
   passwd: sushant
@@ -23,7 +23,7 @@ registry:
 # servers nodes to create ensemble for benchmarking
 server-containers:
   nodes:
-    1: 10.32.41.3
+    1: 10.32.41.7
     2: 10.32.41.4
     3: 10.32.41.5
   user: 013736658
@@ -31,8 +31,11 @@ server-containers:
   passwordLess: True
   home: /srv/home/013736658
   icTestDir: /srv3/test
-  icDataDir: /srv2/snap
-#  icDataLogDir: /srv3/log
+  icDataDir: /srv2/snapshot
+  #icTestDir: /srv/home/013736658/zkramfs/td
+  #icDataDir: /srv/home/013736658/zkramfs/dd
+  #icDataLogDir: /srv/home/013736658/zkramfs/dld
+  # icDataLogDir: /srv3/log
   icDataLogDir: /nvme1/sut-txn
   cwd-prefix: /srv/home/013736658/zkperf-sic
 
@@ -41,8 +44,10 @@ server-containers:
 # nodes from which to run clients for benchmarking
 client-containers:
   nodes:
-    1: 10.32.41.1
-    2: 10.32.41.7
+    1: 10.32.41.6
+    2: 10.32.41.3
+    3: 10.32.41.1
+    #4: 10.32.41.1
   user: 013736658
   passwd:
   passwordLess: true
@@ -51,7 +56,8 @@ client-containers:
 
 # generate load node
 load-manager:
-  host: cs-reed-06.cs.sjsu.edu
+  #host: cs-reed-06.cs.sjsu.edu
+  host: 10.32.41.2
   cwd: /srv/home/013736658/zkperf-ctrl
   user: 013736658
   passwd:
