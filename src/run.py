@@ -16,7 +16,7 @@ reg = ZooRegistry()
 lm = LoadManager()
 
 exec_time = 180
-reqsz_bytes = [1024]
+reqsz_bytes = [2048]
 # reqsz_bytes = [1024, 2048, 65536, 4096]
 #samples = random.sample(range(0, 101, 10), 11)
 samples = range(0, 101, 10)

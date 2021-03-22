@@ -1,0 +1,144 @@
+import logging
+import time
+import sys
+import random
+
+from containers import ServerContainer, ClientContainer
+from registry import ZooRegistry
+from collector import LoadManager
+
+LOG = logging.getLogger('root')
+logging.basicConfig(filename="app.log", level=logging.INFO, format="%(asctime)s: %(message)s")
+
+sic = ServerContainer()
+cic = ClientContainer()
+reg = ZooRegistry()
+lm = LoadManager()
+
+exec_time = 600
+reqsz_bytes = [1024, 2048, 65536, 4096]
+#samples = random.sample(range(0, 101, 10), 11)
+samples = range(0, 101, 10)
+
+def setup():
+    reg.setup()
+    sic.setup()
+    cic.setup()
+    lm.setup()
+
+
+def start(sys_props):
+    LOG.info("starting registry...")
+    reg.start()
+    # time.sleep(2)
+    LOG.info("starting server ics...")
+    sic.start(sys_props)
+    # time.sleep(2)
+    LOG.info("starting client ics...")
+    cic.start()
+    # time.sleep(2)
+
+
+def stop():
+    LOG.info("stopping client ics...")
+    cic.stop()
+    LOG.info("stopping server ics...")
+    sic.stop()
+    LOG.info("stopping registry ics...")
+    reg.stop()
+
+
+def destroy():
+    cic.destroy()
+    sic.destroy()
+    reg.destroy()
+    lm.destroy()
+
+def cleanall():
+    LOG.info("stopping collector...")
+    lm.stop()
+    LOG.info("stopping client ics...")
+    cic.stop()
+    LOG.info("stopping server ics...")
+    sic.stop()
+    LOG.info("stopping registry ics...")
+    reg.stop()
+    cic.destroy()
+    sic.destroy()
+    reg.destroy()
+    lm.destroy()
+
+def del_data():
+    sic.del_sic_data()
+    reg.del_zkreg_data()
+
+
+no_test = True
+
+def run_test(name='', algo='', sys_prop='', reqsz=1024, servers=3, clients=0):
+    LOG.info("BENCH: %s", name)
+    LOG.info("__config__ - props:%s reqsz:%s server:%s clients:%s",
+             sys_prop, reqsz, servers, clients)
+
+    # start registry and instance containers
+    start(sys_prop)
+
+    #samples = range(0, 101, 10)
+    tm = lm.gen_load_file(exec_time, name, samples)
+
+    LOG.info("start load manager...")
+    lm.start(sys_prop, servers, clients, reqsz)
+
+    if no_test:
+        time.sleep(10000000)
+        return
+
+    LOG.info("waiting...")
+    time.sleep(tm)
+
+    LOG.info("pull bench data file...")
+    lm.get_bench_data(name)
+
+    LOG.info("stop load manager...")
+    lm.stop()
+
+    LOG.info("stop ics and registry...")
+    # stop registry and instance containers
+    stop()
+
+    LOG.info("delete data...")
+    # delete data from prev run
+    del_data()
+
+
+def test_noadhash_digest():
+    LOG.info("===> test: no adhash (no digest check) ")
+    for sz in reqsz_bytes:
+        name = "NA_" + str(sz) + "KiB"
+        run_test(name=name, algo="NA", sys_prop=' -Dzookeeper.digest.enabled=false ', reqsz=sz)
+
+
+def test_digest():
+    hash_algos = ['SHA-256', 'CRC-32', 'SHA', 'SHA-512', 'MD5']
+
+    predictive_digest = [True, False]
+    for sz in reqsz_bytes:
+        for pd in predictive_digest:
+            for ha in hash_algos:
+                name = ha + '_PD-' + str(pd) + '_' + str(sz) + 'KiB'
+                prop = (' -Dzookeeper.digest.enabled=true'
+                        + ' -Dzookeeper.digest.algorithm=' + str(ha)
+                        + ' -Dzookeeper.predictive.digest=' + str(pd).lower() + ' ')
+                run_test(name=name, algo=ha, sys_prop=prop, reqsz=sz)
+
+
+if __name__ == '__main__':
+    if (len(sys.argv) > 1 and sys.argv[1] == "-c"):
+        print("cleanup..")
+        cleanall()
+        sys.exit()
+    setup()
+    test_digest()
+    test_noadhash_digest()
+    stop()
+    destroy()

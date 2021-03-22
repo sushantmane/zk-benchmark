@@ -1,0 +1,25 @@
+sleep 150
+save /srv/home/013736658/zkperf-ctrl/bench.SHA_PD-True_2048KiB
+percentage 0
+sleep 180
+percentage 10
+sleep 180
+percentage 20
+sleep 180
+percentage 30
+sleep 180
+percentage 40
+sleep 180
+percentage 50
+sleep 180
+percentage 60
+sleep 180
+percentage 70
+sleep 180
+percentage 80
+sleep 180
+percentage 90
+sleep 180
+percentage 100
+sleep 180
+exit
