@@ -51,7 +51,7 @@ class LoadManager:
 
     def gen_load_file(self, sleep_dur, ext, samples):
         time = 60
-        # samples = random.sample(range(0, 101, 10), 11)
+        #samples = random.sample(range(0, 101, 10), 11)
         gen_out = self.cwd + "/bench." + ext
         with open(self.load_data_file, 'w') as f:
             f.write("sleep 150\n")

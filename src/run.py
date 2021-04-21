@@ -16,10 +16,13 @@ reg = ZooRegistry()
 lm = LoadManager()
 
 exec_time = 180
-reqsz_bytes = [2048]
+#reqsz_bytes = [4096, 2048, 1024]
+reqsz_bytes = [4096, 2048, 1024, 512, 256, 128, 64, 16]
 # reqsz_bytes = [1024, 2048, 65536, 4096]
+samples = list(range(0, 101, 10))
+samples.reverse()
+samples.insert(0, 50)
 #samples = random.sample(range(0, 101, 10), 11)
-samples = range(0, 101, 10)
 
 def setup():
     reg.setup()
@@ -114,21 +117,19 @@ def run_test(name='', algo='', sys_prop='', reqsz=1024, servers=3, clients=900):
 def test_noadhash_digest():
     LOG.info("===> test: no adhash (no digest check) ")
     for sz in reqsz_bytes:
-        name = "NA_" + str(sz) + "KiB"
+        name = "NA_" + str(sz) + "B"
         run_test(name=name, algo="NA", sys_prop=' -Dzookeeper.digest.enabled=false ', reqsz=sz)
 
 
 def test_digest():
-    #hash_algos = ['MD5', 'SHA']
-    hash_algos = ['SHA-512', 'MD5', 'CRC-32', 'SHA-256', 'SHA']
     #hash_algos = ['CRC-32', 'SHA-256', 'SHA', 'SHA-512', 'MD5']
-    #hash_algos = ['CRC-32', 'MD5', 'SHA3-256']
+    hash_algos = ['SHA', 'CRC-32', 'MD5', 'SHA-256', 'SHA-512']
 
     predictive_digest = [False, True]
     for sz in reqsz_bytes:
         for pd in predictive_digest:
             for ha in hash_algos:
-                name = ha + '_PD-' + str(pd) + '_' + str(sz) + 'KiB'
+                name = ha + '_PD-' + str(pd) + '_' + str(sz) + 'B'
                 prop = (' -Dzookeeper.digest.enabled=true'
                         + ' -Dzookeeper.digest.algorithm=' + str(ha)
                         + ' -Dzookeeper.predictive.digest=' + str(pd).lower() + ' ')

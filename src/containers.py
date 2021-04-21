@@ -52,6 +52,7 @@ class ServerContainer:
 
             cmd = ("java " + sys_props
                    + ic_ip
+                   + " -Dzookeeper.4lw.commands.whitelist=* "
                    + " -Dzookeeper.log.dir=" + self.cwd
                    + " -Dlog4j.configuration=file:" + self.log4j_remote
                    + " -Dtest.data.dir=" + self.ic_test_dir

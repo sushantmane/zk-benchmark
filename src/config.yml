@@ -30,7 +30,7 @@ server-containers:
   passwd:
   passwordLess: True
   home: /srv/home/013736658
-  icTestDir: /srv3/test
+  icTestDir: /srv2/test
   icDataDir: /srv2/snapshot
   #icTestDir: /srv/home/013736658/zkramfs/td
   #icDataDir: /srv/home/013736658/zkramfs/dd
@@ -44,9 +44,9 @@ server-containers:
 # nodes from which to run clients for benchmarking
 client-containers:
   nodes:
-    1: 10.32.41.6
-    2: 10.32.41.3
-    3: 10.32.41.1
+    1: 10.32.41.1
+    2: 10.32.41.6
+    3: 10.32.41.3
     #4: 10.32.41.1
   user: 013736658
   passwd:
