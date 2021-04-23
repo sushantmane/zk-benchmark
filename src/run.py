@@ -18,7 +18,7 @@ lm = LoadManager()
 exec_time = 180
 #reqsz_bytes = [4096, 2048, 1024]
 #reqsz_bytes = [4096, 2048, 1024, 512, 256, 128, 64, 16]
-reqsz_bytes = [64, 32]
+reqsz_bytes = [32]
 # reqsz_bytes = [1024, 2048, 65536, 4096]
 samples = list(range(0, 101, 10))
 samples.reverse()
@@ -143,7 +143,7 @@ if __name__ == '__main__':
         cleanall()
         sys.exit()
     setup()
-    test_noadhash_digest()
-    #test_digest()
+    #test_noadhash_digest()
+    test_digest()
     stop()
     destroy()
