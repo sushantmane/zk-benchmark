@@ -1,5 +1,5 @@
 sleep 150
-save /srv/home/013736658/zkperf-ctrl/bench.SHA_PD-True_1024B
+save /srv/home/013736658/zkperf-ctrl/bench.SHA-512_PD-True_16B
 percentage 50
 sleep 180
 percentage 100
